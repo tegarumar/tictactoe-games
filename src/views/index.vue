@@ -1,28 +1,40 @@
 <template>
   <section>
-    <img src="@/assets/Tictactoe.svg" alt="Tictactoe" title="Game Tictactoe" />
-    <div class="board-container">
-      <div class="board">
-        <div
-          class="cell"
-          v-for="(cell, index) in board"
-          :key="index"
-          @click="makeMove(index)"
-        >
-          {{ cell }}
+    <div class="m-auto w-100">
+      <img
+        src="@/assets/Tictactoe.svg"
+        alt="Tictactoe"
+        title="Game Tictactoe"
+      />
+      <div class="board-container">
+        <div class="board">
+          <div
+            class="cell"
+            v-for="(cell, index) in board"
+            :key="index"
+            @click="makeMove(index)"
+          >
+            {{ cell }}
+          </div>
         </div>
+        <div v-if="currentPlayer === 'O' && !gameOver">
+          Wait for the bot to choose....
+        </div>
+        <button
+          class="btn btn-cartoon"
+          :class="currentPlayer === 'O' && !gameOver ? 'mt-2' : 'mt-0'"
+          @click="resetBoard"
+        >
+          Reset
+        </button>
       </div>
-      <div v-if="currentPlayer === 'O' && !gameOver">
-        Wait for the bot to choose....
-      </div>
-      <button
-        class="btn btn-cartoon"
-        :class="currentPlayer === 'O' && !gameOver ? 'mt-2' : 'mt-0'"
-        @click="resetBoard"
-      >
-        Reset
-      </button>
     </div>
+    <footer class="mt-auto">
+      made with <span style="color: #e25555">&hearts;</span> by
+      <a href="https://www.linkedin.com/in/tegarumarabdillah/" target="_blank"
+        >Tegar</a
+      >
+    </footer>
   </section>
 </template>
 
