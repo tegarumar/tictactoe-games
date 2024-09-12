@@ -1,33 +1,33 @@
 <template>
   <section>
-    <div class="m-auto w-100">
-      <img
-        src="@/assets/Tictactoe.svg"
-        alt="Tictactoe"
-        title="Game Tictactoe"
-      />
-      <div class="board-container">
-        <div class="board">
-          <div
-            class="cell"
-            v-for="(cell, index) in board"
-            :key="index"
-            @click="makeMove(index)"
-          >
-            {{ cell }}
-          </div>
-        </div>
-        <div v-if="currentPlayer === 'O' && !gameOver">
-          Wait for the bot to choose....
-        </div>
-        <button
-          class="btn btn-cartoon"
-          :class="currentPlayer === 'O' && !gameOver ? 'mt-2' : 'mt-0'"
-          @click="resetBoard"
+    <img
+      src="@/assets/Tictactoe.svg"
+      alt="Tictactoe"
+      title="Game Tictactoe"
+      class="mb-3"
+    />
+    <span>If you can beat my algorithm, you're damn good.</span>
+    <div class="board-container">
+      <div class="board">
+        <div
+          class="cell"
+          v-for="(cell, index) in board"
+          :key="index"
+          @click="makeMove(index)"
         >
-          Reset
-        </button>
+          {{ cell }}
+        </div>
       </div>
+      <div v-if="currentPlayer === 'O' && !gameOver">
+        Wait for the bot to choose....
+      </div>
+      <button
+        class="btn btn-cartoon"
+        :class="currentPlayer === 'O' && !gameOver ? 'mt-2' : 'mt-0'"
+        @click="resetBoard"
+      >
+        Reset
+      </button>
     </div>
     <footer class="mt-auto">
       made with <span style="color: #e25555">&hearts;</span> by
@@ -231,6 +231,7 @@ section {
   align-items: center;
   justify-content: center;
   width: 100%;
+  position: relative;
 }
 
 .board-container {
@@ -279,6 +280,14 @@ section {
   box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 1);
   -webkit-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 1);
   -moz-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 1);
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
 }
 
 @media (max-width: 480px) {
