@@ -37,13 +37,14 @@ export default {
       board: Array(9).fill(""),
       currentPlayer: "X",
       gameOver: false,
+      botLevel: "hard", // level 'easy', 'medium', atau 'hard'
     };
   },
   methods: {
     makeMove(index) {
       if (!this.board[index] && !this.gameOver) {
         if (this.currentPlayer === "O") {
-          return; // Menunggu bot mengisi
+          return; // Nunggu bot
         }
         this.board.splice(index, 1, this.currentPlayer);
         if (this.checkWin(this.currentPlayer)) {
@@ -56,7 +57,6 @@ export default {
         } else {
           this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
           if (this.currentPlayer === "O") {
-            this.currentPlayer = "O";
             setTimeout(() => {
               this.makeBotMove();
             }, 1000);
@@ -88,30 +88,125 @@ export default {
     resetBoard() {
       this.board = Array(9).fill("");
       this.currentPlayer = "X";
+      this.botLevel = "hard";
       this.gameOver = false;
     },
     makeBotMove() {
-      // Logic untuk menentukan langkah bot
+      if (this.botLevel === "easy") {
+        this.makeEasyMove();
+      } else if (this.botLevel === "medium") {
+        this.makeMediumMove();
+      } else if (this.botLevel === "hard") {
+        this.makeHardMove();
+      }
+    },
+    makeEasyMove() {
+      let emptyCells = this.getEmptyCells();
+      const randomIndex = Math.floor(Math.random() * emptyCells.length);
+      const botMove = emptyCells[randomIndex];
+      this.makeMoveForBot(botMove);
+    },
+    makeMediumMove() {
+      let emptyCells = this.getEmptyCells();
+      // Cek apakah pemain akan menang di langkah selanjutnya
+      for (let i = 0; i < emptyCells.length; i++) {
+        const testBoard = [...this.board];
+        testBoard[emptyCells[i]] = "X"; // Simulasikan langkah pemain
+        if (this.checkWin("X")) {
+          this.makeMoveForBot(emptyCells[i]); // Jika pemain akan menang, cegah ajik paur
+          return;
+        }
+      }
+      // Jika tidak ada yang harus dicegah, pilih langkah secara acak
+      this.makeEasyMove();
+    },
+    makeHardMove() {
+      const bestMove = this.minimax(this.board, "O").index;
+      this.makeMoveForBot(bestMove);
+    },
+    getEmptyCells() {
       let emptyCells = [];
       for (let i = 0; i < this.board.length; i++) {
         if (this.board[i] === "") {
           emptyCells.push(i);
         }
       }
-      const randomIndex = Math.floor(Math.random() * emptyCells.length);
-      const botMove = emptyCells[randomIndex];
-      this.board.splice(botMove, 1, this.currentPlayer);
-
+      return emptyCells;
+    },
+    makeMoveForBot(index) {
+      this.board.splice(index, 1, this.currentPlayer);
       if (this.checkWin(this.currentPlayer)) {
         this.alertSuccess("Sorry, Bot win!");
         this.gameOver = true;
       } else if (this.checkDraw()) {
-        alert("It's a draw!");
+        this.alertSuccess("It's a draw!");
         this.gameOver = true;
       } else {
         this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
       }
     },
+    minimax(board, player) {
+      const emptyCells = this.getEmptyCells();
+
+      if (this.checkWin("X")) {
+        return { score: -10 };
+      } else if (this.checkWin("O")) {
+        return { score: 10 };
+      } else if (emptyCells.length === 0) {
+        return { score: 0 };
+      }
+
+      let moves = [];
+
+      for (let i = 0; i < emptyCells.length; i++) {
+        let move = {};
+        move.index = emptyCells[i];
+        board[emptyCells[i]] = player;
+
+        if (player === "O") {
+          let result = this.minimax(board, "X");
+          move.score = result.score;
+        } else {
+          let result = this.minimax(board, "O");
+          move.score = result.score;
+        }
+
+        board[emptyCells[i]] = "";
+        moves.push(move);
+      }
+
+      let bestMove;
+      if (player === "O") {
+        let bestScore = -10000;
+        for (let i = 0; i < moves.length; i++) {
+          if (moves[i].score > bestScore) {
+            bestScore = moves[i].score;
+            bestMove = i;
+          }
+        }
+      } else {
+        let bestScore = 10000;
+        for (let i = 0; i < moves.length; i++) {
+          if (moves[i].score < bestScore) {
+            bestScore = moves[i].score;
+            bestMove = i;
+          }
+        }
+      }
+      return moves[bestMove];
+    },
+
+    secretKeyToEasy(e) {
+      if (e.key == "/") {
+        this.botLevel = "easy";
+      }
+    },
+  },
+  mounted() {
+    window.addEventListener("keydown", this.secretKeyToEasy);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.secretKeyToEasy);
   },
 };
 </script>
